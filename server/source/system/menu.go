@@ -24,7 +24,7 @@ func (i *initMenu) InitializerName() string {
 }
 
 func (i *initMenu) MigrateTable(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -36,7 +36,7 @@ func (i *initMenu) MigrateTable(ctx context.Context) (context.Context, error) {
 }
 
 func (i *initMenu) TableCreated(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}
@@ -47,7 +47,7 @@ func (i *initMenu) TableCreated(ctx context.Context) bool {
 }
 
 func (i *initMenu) InitializeData(ctx context.Context) (next context.Context, err error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -86,6 +86,7 @@ func (i *initMenu) InitializeData(ctx context.Context) (next context.Context, er
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "dictionary", Name: "dictionary", Component: "view/superAdmin/dictionary/sysDictionary.vue", Sort: 5, Meta: Meta{Title: "system.menu.dictManage", Icon: "notebook"}},
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "operation", Name: "operation", Component: "view/superAdmin/operation/sysOperationRecord.vue", Sort: 6, Meta: Meta{Title: "system.menu.operationLog", Icon: "pie-chart"}},
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "sysParams", Name: "sysParams", Component: "view/superAdmin/params/sysParams.vue", Sort: 7, Meta: Meta{Title: "system.menu.parameterManagement", Icon: "compass"}},
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "rating", Name: "rating", Component: "view/rating/rating.vue", Sort: 8, Meta: Meta{Title: "system.menu.ratingManage", Icon: "star"}},
 
 		// example子菜单
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["example"], Path: "upload", Name: "upload", Component: "view/example/upload/upload.vue", Sort: 5, Meta: Meta{Title: "system.menu.mediaLibUpDown", Icon: "upload"}},
@@ -124,7 +125,7 @@ func (i *initMenu) InitializeData(ctx context.Context) (next context.Context, er
 }
 
 func (i *initMenu) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

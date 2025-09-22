@@ -31,7 +31,7 @@ func (userService *UserService) Register(u system.SysUser) (userInter system.Sys
 		return userInter, errors.New(global.Translate("sys_auto_code.usernameRegistered"))
 	}
 	// 否则 附加uuid 密码hash加密 注册
-	u.Password = utils.BcryptHash(u.Password)
+	u.Password = utils.BcryptHash(u.Password) // passWord
 	u.UUID = uuid.New()
 	err = global.GVA_DB.Create(&u).Error
 	return u, err
@@ -52,7 +52,7 @@ func (userService *UserService) Login(u *system.SysUser) (userInter *system.SysU
 	var user system.SysUser
 	err = global.GVA_DB.Where("username = ?", u.Username).Preload("Authorities").Preload("Authority").First(&user).Error
 	if err == nil {
-		if ok := utils.BcryptCheck(u.Password, user.Password); !ok {
+		if ok := utils.BcryptCheck(u.Password, user.Password); !ok { // passWord
 			return nil, errors.New(global.Translate("sys_auto_code.passwordError"))
 		}
 		MenuServiceApp.UserAuthorityDefaultRouter(&user)
@@ -103,6 +103,9 @@ func (userService *UserService) GetUserInfoList(info systemReq.GetUserList) (lis
 	}
 	if info.Email != "" {
 		db = db.Where("email LIKE ?", "%"+info.Email+"%")
+	}
+	if info.Team != "" {
+		db = db.Where("team = ?", info.Team)
 	}
 
 	err = db.Count(&total).Error
@@ -229,7 +232,7 @@ func (userService *UserService) DeleteUser(id int) (err error) {
 
 func (userService *UserService) SetUserInfo(req system.SysUser) error {
 	return global.GVA_DB.Model(&system.SysUser{}).
-		Select("updated_at", "nick_name", "header_img", "phone", "email", "enable").
+		Select("updated_at", "nick_name", "header_img", "phone", "email", "enable", "team").
 		Where("id=?", req.ID).
 		Updates(map[string]interface{}{
 			"updated_at": time.Now(),
@@ -238,6 +241,7 @@ func (userService *UserService) SetUserInfo(req system.SysUser) error {
 			"phone":      req.Phone,
 			"email":      req.Email,
 			"enable":     req.Enable,
+			"team":       req.Team,
 		}).Error
 }
 

@@ -3,6 +3,8 @@ package system
 import (
 	"context"
 	"errors"
+	"path/filepath"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/config"
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
@@ -11,7 +13,6 @@ import (
 	"github.com/gookit/color"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
-	"path/filepath"
 )
 
 type MssqlInitHandler struct{}
@@ -22,7 +23,7 @@ func NewMssqlInitHandler() *MssqlInitHandler {
 
 // WriteConfig mssql回写配置
 func (h MssqlInitHandler) WriteConfig(ctx context.Context) error {
-	c, ok := ctx.Value("config").(config.Mssql)
+	c, ok := ctx.Value(ContextKeyConfig).(config.Mssql)
 	if !ok {
 		return errors.New("mssql config invalid")
 	}
@@ -39,12 +40,12 @@ func (h MssqlInitHandler) WriteConfig(ctx context.Context) error {
 
 // EnsureDB 创建数据库并初始化 mssql
 func (h MssqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (next context.Context, err error) {
-	if s, ok := ctx.Value("dbtype").(string); !ok || s != "mssql" {
+	if s, ok := ctx.Value(ContextKeyDBType).(string); !ok || s != "mssql" {
 		return ctx, ErrDBTypeMismatch
 	}
 
 	c := conf.ToMssqlConfig()
-	next = context.WithValue(ctx, "config", c)
+	next = context.WithValue(ctx, ContextKeyConfig, c)
 	if c.Dbname == "" {
 		return ctx, nil
 	} // 如果没有数据库名, 则跳出初始化数据
@@ -63,7 +64,7 @@ func (h MssqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (n
 	}
 
 	global.GVA_CONFIG.AutoCode.Root, _ = filepath.Abs("..")
-	next = context.WithValue(next, "db", db)
+	next = context.WithValue(next, ContextKeyDB, db)
 	return next, err
 }
 

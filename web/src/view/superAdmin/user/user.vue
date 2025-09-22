@@ -27,6 +27,16 @@
             :placeholder="t('view.superAdmin.user.email')"
           />
         </el-form-item>
+        <el-form-item :label="t('view.superAdmin.user.team')">
+          <el-select v-model="searchInfo.team" clearable :placeholder="t('general.pleaseSelect')">
+            <el-option
+              v-for="item in teamOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" icon="search" @click="onSubmit">
             {{ t('general.search') }}
@@ -77,6 +87,12 @@
           :label="t('view.superAdmin.user.email')"
           min-width="180"
           prop="email"
+        />
+        <el-table-column
+          align="left"
+          :label="t('view.superAdmin.user.team')"
+          min-width="120"
+          prop="team"
         />
         <el-table-column
           align="left"
@@ -238,9 +254,9 @@
         <el-form-item
           v-if="dialogFlag === 'add'"
           :label="t('view.superAdmin.user.password')"
-          prop="password"
+          prop="passWord"
         >
-          <el-input v-model="userInfo.password" />
+          <el-input v-model="userInfo.passWord" show-password />
         </el-form-item>
         <el-form-item
           :label="t('view.superAdmin.user.nickName')"
@@ -255,8 +271,25 @@
           <el-input v-model="userInfo.email" />
         </el-form-item>
         <el-form-item
+          v-if="isTeamMemberOrLead"
+          :label="t('view.superAdmin.user.team')"
+          prop="team"
+        >
+          <el-select
+            v-model="userInfo.team"
+            style="width: 100%"
+            :placeholder="t('general.pleaseSelect')"
+          >
+            <el-option
+              v-for="item in teamOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value" />
+          </el-select>
+        </el-form-item>
+        <el-form-item
           :label="t('view.superAdmin.user.userRole')"
-          prop="authorityId"
+          prop="authorityIds"
         >
           <el-cascader
             v-model="userInfo.authorityIds"
@@ -271,6 +304,7 @@
               disabled: 'disabled',
               emitPath: false
             }"
+            @change="checkTeamAuth"
             :clearable="false"
           />
         </el-form-item>
@@ -308,7 +342,7 @@
 
   import { nextTick, ref, watch } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
-  import SelectImage from '@/components/selectImage/selectImage.vue'
+  import SelectImage from '@/components/selectImage/selectImage.vue' // added by mohamed hassan to support multilingual
   import { useAppStore } from "@/pinia";
   import { useI18n } from 'vue-i18n' // added by mohamed hassan to support multilingual
 
@@ -324,7 +358,8 @@
     username: '',
     nickname: '',
     phone: '',
-    email: ''
+    email: '',
+    team: ''
   })
 
   const onSubmit = () => {
@@ -337,7 +372,8 @@
       username: '',
       nickname: '',
       phone: '',
-      email: ''
+      email: '',
+      team: ''
     }
     getTableData()
   }
@@ -393,12 +429,14 @@
     }
   }
 
-  watch(
-    () => tableData.value,
-    () => {
-      setAuthorityIds()
-    }
-  )
+  const teamOptions = ref([
+    { label: 'Android', value: 'Android' },
+    { label: 'Linux', value: 'Linux' },
+    { label: 'Frontend', value: 'Frontend' },
+    { label: 'Backend', value: 'Backend' },
+    { label: 'QC', value: 'QC' },
+    { label: 'PM & BA', value: 'PM & BA' },
+  ])
 
   const initPage = async () => {
     getTableData()
@@ -407,6 +445,13 @@
   }
 
   initPage()
+
+  watch(
+    () => tableData.value,
+    () => {
+      setAuthorityIds()
+    }
+  )
 
   // 重置密码对话框相关
   const resetPwdDialog = ref(false)
@@ -498,6 +543,7 @@
   const setOptions = (authData) => {
     authOptions.value = []
     setAuthorityOptions(authData, authOptions.value)
+    findAuthority(authOptions.value)
   }
 
   const deleteUserFunc = async (row) => {
@@ -515,16 +561,46 @@
   }
 
   // 弹窗相关
-  const userInfo = ref({
+  const initUserInfo = {
     userName: '',
-    password: '',
+    passWord: '',
     nickName: '',
     headerImg: '',
     authorityId: '',
     authorityIds: [],
-    enable: 1
-  })
+    enable: 1,
+    team: ''
+  }
+  const userInfo = ref(JSON.parse(JSON.stringify(initUserInfo)))
 
+  const isTeamMemberOrLead = ref(false)
+
+  const authorityIdToName = {}
+  const findAuthority = (auths) => {
+    auths && auths.forEach(item => {
+      authorityIdToName[item.authorityId] = item.authorityName
+      if (item.children && item.children.length) {
+        findAuthority(item.children)
+      }
+    })
+  }
+
+  const checkTeamAuth = (authIdArray) => {
+    if (!authIdArray) authIdArray = []
+    // The role names to check against.
+    // These are the raw 'authorityName' values from the database.
+    const teamRoleNames = ['Team Lead', 'Team Member']
+    const selectedRoleNames = authIdArray.map(id => authorityIdToName[id])
+    const isTeamRole = selectedRoleNames.some(name => teamRoleNames.includes(name))
+
+    isTeamMemberOrLead.value = isTeamRole
+
+    if (!isTeamMemberOrLead.value) {
+      userInfo.value.team = '' // Clear team if the role is not applicable
+    }
+  }
+
+  // Watch for changes in the selected roles
   const rules = ref({
     userName: [
       {
@@ -538,7 +614,7 @@
         trigger: 'blur'
       }
     ],
-    password: [
+    passWord: [
       {
         required: true,
         message: t('view.superAdmin.user.passwordNote'),
@@ -571,11 +647,11 @@
         trigger: 'blur'
       }
     ],
-    authorityId: [
+    authorityIds: [
       {
         required: true,
         message: t('view.superAdmin.user.userRoleNote'),
-        trigger: 'blur'
+        trigger: 'change'
       }
     ]
   })
@@ -616,16 +692,17 @@
   const addUserDialog = ref(false)
   const closeAddUserDialog = () => {
     userForm.value.resetFields()
-    userInfo.value.headerImg = ''
-    userInfo.value.authorityIds = []
+    userInfo.value = JSON.parse(JSON.stringify(initUserInfo))
     addUserDialog.value = false
   }
 
   const dialogFlag = ref('add')
 
   const addUser = () => {
-    addUserDialog.value = true
     dialogFlag.value = 'add'
+    userInfo.value = JSON.parse(JSON.stringify(initUserInfo))
+    isTeamMemberOrLead.value = false
+    addUserDialog.value = true
   }
 
   const tempAuth = {}
@@ -659,6 +736,7 @@
   const openEdit = (row) => {
     dialogFlag.value = 'edit'
     userInfo.value = JSON.parse(JSON.stringify(row))
+    checkTeamAuth(userInfo.value.authorityIds || [])
     addUserDialog.value = true
   }
 

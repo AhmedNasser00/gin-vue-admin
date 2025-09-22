@@ -20,7 +20,7 @@ func init() {
 }
 
 func (i *initDictDetail) MigrateTable(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -28,7 +28,7 @@ func (i *initDictDetail) MigrateTable(ctx context.Context) (context.Context, err
 }
 
 func (i *initDictDetail) TableCreated(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}
@@ -40,7 +40,7 @@ func (i *initDictDetail) InitializerName() string {
 }
 
 func (i *initDictDetail) InitializeData(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -109,7 +109,7 @@ func (i *initDictDetail) InitializeData(ctx context.Context) (context.Context, e
 }
 
 func (i *initDictDetail) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

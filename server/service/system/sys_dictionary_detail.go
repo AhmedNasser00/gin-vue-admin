@@ -100,17 +100,6 @@ func (dictionaryDetailService *DictionaryDetailService) GetDictionaryList(dictio
 	return sysDictionaryDetails, err
 }
 
-// 按照字典type获取字典全部内容的方法
-func (dictionaryDetailService *DictionaryDetailService) GetDictionaryListByType(t string) (list []system.SysDictionaryDetail, err error) {
-	var sysDictionaryDetails []system.SysDictionaryDetail
-	db := global.GVA_DB.Model(&system.SysDictionaryDetail{}).Joins("JOIN sys_dictionaries ON sys_dictionaries.id = sys_dictionary_details.sys_dictionary_id")
-	err = db.Debug().Find(&sysDictionaryDetails, "type = ?", t).Error
-	for i := range sysDictionaryDetails {
-		sysDictionaryDetails[i].Label = global.Translate(sysDictionaryDetails[i].Label)
-	}
-	return sysDictionaryDetails, err
-}
-
 // 按照字典id+字典内容value获取单条字典内容
 func (dictionaryDetailService *DictionaryDetailService) GetDictionaryInfoByValue(dictionaryID uint, value string) (detail system.SysDictionaryDetail, err error) {
 	var sysDictionaryDetail system.SysDictionaryDetail
@@ -126,4 +115,15 @@ func (dictionaryDetailService *DictionaryDetailService) GetDictionaryInfoByTypeV
 	err = db.First(&sysDictionaryDetail, "sys_dictionaries.type = ? and sys_dictionary_details.value = ?", t, value).Error
 	sysDictionaryDetail.Label = global.Translate(sysDictionaryDetail.Label)
 	return sysDictionaryDetail, err
+}
+
+// 按照字典type获取字典全部内容的方法
+func (dictionaryDetailService *DictionaryDetailService) GetDictionaryListByType(t string) (list []system.SysDictionaryDetail, err error) {
+	var sysDictionaryDetails []system.SysDictionaryDetail
+	db := global.GVA_DB.Model(&system.SysDictionaryDetail{}).Joins("JOIN sys_dictionaries ON sys_dictionaries.id = sys_dictionary_details.sys_dictionary_id")
+	err = db.Where("sys_dictionaries.type = ? AND sys_dictionary_details.status = ?", t, true).Order("sort").Find(&sysDictionaryDetails).Error
+	for i := range sysDictionaryDetails {
+		sysDictionaryDetails[i].Label = global.Translate(sysDictionaryDetails[i].Label)
+	}
+	return sysDictionaryDetails, err
 }

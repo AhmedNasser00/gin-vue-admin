@@ -31,7 +31,7 @@ func (i *initMenuAuthority) InitializerName() string {
 }
 
 func (i *initMenuAuthority) InitializeData(ctx context.Context) (next context.Context, err error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -92,7 +92,7 @@ func (i *initMenuAuthority) InitializeData(ctx context.Context) (next context.Co
 			parentName = menuMap[menu.ParentId].Name
 		}
 
-		if menu.ParentId > 0 && (parentName == "systemTools" || parentName == "example") {
+		if menu.ParentId > 0 && (parentName == "systemTools" || parentName == "example" || parentName == "superAdmin") {
 			menu9528 = append(menu9528, menu)
 		}
 	}
@@ -105,7 +105,7 @@ func (i *initMenuAuthority) InitializeData(ctx context.Context) (next context.Co
 }
 
 func (i *initMenuAuthority) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

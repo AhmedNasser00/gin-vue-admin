@@ -21,7 +21,7 @@ func init() {
 }
 
 func (i *initAuthority) MigrateTable(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -29,7 +29,7 @@ func (i *initAuthority) MigrateTable(ctx context.Context) (context.Context, erro
 }
 
 func (i *initAuthority) TableCreated(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}
@@ -41,7 +41,7 @@ func (i *initAuthority) InitializerName() string {
 }
 
 func (i *initAuthority) InitializeData(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -78,7 +78,7 @@ func (i *initAuthority) InitializeData(ctx context.Context) (context.Context, er
 }
 
 func (i *initAuthority) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

@@ -151,7 +151,7 @@ func (b *BaseApi) Register(c *gin.Context) {
 			AuthorityId: v,
 		})
 	}
-	user := &system.SysUser{Username: r.Username, NickName: r.NickName, Password: r.Password, HeaderImg: r.HeaderImg, AuthorityId: r.AuthorityId, Authorities: authorities, Enable: r.Enable, Phone: r.Phone, Email: r.Email}
+	user := &system.SysUser{Username: r.Username, NickName: r.NickName, Password: r.Password, HeaderImg: r.HeaderImg, AuthorityId: r.AuthorityId, Authorities: authorities, Enable: r.Enable, Phone: r.Phone, Email: r.Email, Team: r.Team}
 	userReturn, err := userService.Register(*user)
 	if err != nil {
 		global.GVA_LOG.Error(global.Translate("sys_user.registrationFail"), zap.Error(err))
@@ -207,6 +207,9 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 	if err != nil {
 		response.FailWithMessage(err.Error(), c)
 		return
+	}
+	if pageInfo.Team == "" {
+		pageInfo.Team = c.Query("team")
 	}
 	err = utils.Verify(pageInfo, utils.PageInfoVerify)
 	if err != nil {
@@ -368,6 +371,7 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 		Phone:     user.Phone,
 		Email:     user.Email,
 		Enable:    user.Enable,
+		Team:      user.Team,
 	})
 	if err != nil {
 		global.GVA_LOG.Error(global.Translate("general.setupFailErr"), zap.Error(err))
@@ -403,6 +407,7 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 		Phone:     user.Phone,
 		Email:     user.Email,
 		Enable:    user.Enable,
+		Team:      user.Team,
 	})
 	if err != nil {
 		global.GVA_LOG.Error(global.Translate("general.setupFailErr"), zap.Error(err))

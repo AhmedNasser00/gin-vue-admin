@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	sysModel "github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/service/system"
@@ -23,7 +24,7 @@ func (i *initApiIgnore) InitializerName() string {
 }
 
 func (i *initApiIgnore) MigrateTable(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -31,7 +32,7 @@ func (i *initApiIgnore) MigrateTable(ctx context.Context) (context.Context, erro
 }
 
 func (i *initApiIgnore) TableCreated(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}
@@ -39,7 +40,7 @@ func (i *initApiIgnore) TableCreated(ctx context.Context) bool {
 }
 
 func (i *initApiIgnore) InitializeData(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -66,7 +67,7 @@ func (i *initApiIgnore) InitializeData(ctx context.Context) (context.Context, er
 }
 
 func (i *initApiIgnore) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

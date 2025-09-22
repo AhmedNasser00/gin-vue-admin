@@ -21,6 +21,7 @@ type ApiGroup struct {
 	AutoCodePackageApi
 	AutoCodeHistoryApi
 	AutoCodeTemplateApi
+	RatingApi
 	SysParamsApi
 	SysVersionApi
 }
@@ -46,4 +47,5 @@ var (
 	autoCodeHistoryService  = service.ServiceGroupApp.SystemServiceGroup.AutoCodeHistory
 	autoCodeTemplateService = service.ServiceGroupApp.SystemServiceGroup.AutoCodeTemplate
 	sysVersionService       = service.ServiceGroupApp.SystemServiceGroup.SysVersionService
+	ratingService           = service.ServiceGroupApp.SystemServiceGroup.RatingService
 )

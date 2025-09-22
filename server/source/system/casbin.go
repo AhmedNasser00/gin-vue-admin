@@ -19,7 +19,7 @@ func init() {
 }
 
 func (i *initCasbin) MigrateTable(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -27,7 +27,7 @@ func (i *initCasbin) MigrateTable(ctx context.Context) (context.Context, error) 
 }
 
 func (i *initCasbin) TableCreated(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}
@@ -40,7 +40,7 @@ func (i *initCasbin) InitializerName() string {
 }
 
 func (i *initCasbin) InitializeData(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -291,7 +291,7 @@ func (i *initCasbin) InitializeData(ctx context.Context) (context.Context, error
 }
 
 func (i *initCasbin) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

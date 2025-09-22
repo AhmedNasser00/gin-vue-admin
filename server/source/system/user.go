@@ -22,7 +22,7 @@ func init() {
 }
 
 func (i *initUser) MigrateTable(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -30,7 +30,7 @@ func (i *initUser) MigrateTable(ctx context.Context) (context.Context, error) {
 }
 
 func (i *initUser) TableCreated(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}
@@ -42,12 +42,12 @@ func (i *initUser) InitializerName() string {
 }
 
 func (i *initUser) InitializeData(ctx context.Context) (next context.Context, err error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
 
-	ap := ctx.Value("adminPassword")
+	ap := ctx.Value(system.ContextKeyAdminPassword)
 	apStr, ok := ap.(string)
 	if !ok {
 		apStr = "123456"
@@ -66,6 +66,7 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 			AuthorityId: 888,
 			Phone:       "17611111111",
 			Email:       "333333333@qq.com",
+			Team:        "dev",
 		},
 		{
 			UUID:        uuid.New(),
@@ -75,7 +76,9 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 			HeaderImg:   "https://qmplusimg.henrongyi.top/1572075907logo.png",
 			AuthorityId: 9528,
 			Phone:       "17611111111",
-			Email:       "333333333@qq.com"},
+			Email:       "333333333@qq.com",
+			Team:        "test",
+		},
 	}
 	if err = db.Create(&entities).Error; err != nil {
 		return ctx, errors.Wrap(err, sysModel.SysUser{}.TableName()+" "+global.Translate("system.api.systemUser"))
@@ -95,7 +98,7 @@ func (i *initUser) InitializeData(ctx context.Context) (next context.Context, er
 }
 
 func (i *initUser) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

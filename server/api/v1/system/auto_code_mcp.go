@@ -2,12 +2,14 @@ package system
 
 import (
 	"fmt"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/mcp/client"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/response"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"github.com/gin-gonic/gin"
 	"github.com/mark3labs/mcp-go/mcp"
+	"go.uber.org/zap"
 )
 
 // Create
@@ -50,14 +52,19 @@ func (a *AutoCodeTemplateApi) MCPList(c *gin.Context) {
 	baseUrl := fmt.Sprintf("http://127.0.0.1:%d%s", global.GVA_CONFIG.System.Addr, global.GVA_CONFIG.MCP.SSEPath)
 
 	testClient, err := client.NewClient(baseUrl, "testClient", "v1.0.0", global.GVA_CONFIG.MCP.Name)
+	if err != nil {
+		response.FailWithMessage("创建MCP客户端失败:"+err.Error(), c)
+		global.GVA_LOG.Error("创建MCP客户端失败", zap.Error(err))
+		return
+	}
 	defer testClient.Close()
 	toolsRequest := mcp.ListToolsRequest{}
 
 	list, err := testClient.ListTools(c.Request.Context(), toolsRequest)
 
 	if err != nil {
-		response.FailWithMessage("创建失败", c)
-		global.GVA_LOG.Error(err.Error())
+		response.FailWithMessage("获取工具列表失败:"+err.Error(), c)
+		global.GVA_LOG.Error("获取工具列表失败", zap.Error(err))
 		return
 	}
 

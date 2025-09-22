@@ -5,17 +5,18 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"sort"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/system/request"
 	"gorm.io/gorm"
-	"sort"
 )
 
 const (
-	Mysql           = "mysql"
-	Pgsql           = "pgsql"
-	Sqlite          = "sqlite"
-	Mssql           = "mssql"
+	Mysql  = "mysql"
+	Pgsql  = "pgsql"
+	Sqlite = "sqlite"
+	Mssql  = "mssql"
 )
 
 var (
@@ -35,6 +36,15 @@ var (
 	ErrMissingDBContext        = errors.New("missing db in context")
 	ErrMissingDependentContext = errors.New("missing dependent value in context")
 	ErrDBTypeMismatch          = errors.New("db type mismatch")
+)
+
+type ContextKey string
+
+const (
+	ContextKeyDB            ContextKey = "db"
+	ContextKeyConfig        ContextKey = "config"
+	ContextKeyDBType        ContextKey = "dbtype"
+	ContextKeyAdminPassword ContextKey = "adminPassword"
 )
 
 // SubInitializer 提供 source/*/init() 使用的接口，每个 initializer 完成一个初始化过程
@@ -92,7 +102,7 @@ type InitDBService struct{}
 // InitDB 创建数据库并初始化 总入口
 func (initDBService *InitDBService) InitDB(conf request.InitDB) (err error) {
 	ctx := context.TODO()
-	ctx = context.WithValue(ctx, "adminPassword", conf.AdminPassword)
+	ctx = context.WithValue(ctx, ContextKeyAdminPassword, conf.AdminPassword)
 	if len(initializers) == 0 {
 		return errors.New(global.Translate("sys_auto_code.noAvailableInit"))
 	}
@@ -104,26 +114,26 @@ func (initDBService *InitDBService) InitDB(conf request.InitDB) (err error) {
 	switch conf.DBType {
 	case "mysql":
 		initHandler = NewMysqlInitHandler()
-		ctx = context.WithValue(ctx, "dbtype", "mysql")
+		ctx = context.WithValue(ctx, ContextKeyDBType, "mysql")
 	case "pgsql":
 		initHandler = NewPgsqlInitHandler()
-		ctx = context.WithValue(ctx, "dbtype", "pgsql")
+		ctx = context.WithValue(ctx, ContextKeyDBType, "pgsql")
 	case "sqlite":
 		initHandler = NewSqliteInitHandler()
-		ctx = context.WithValue(ctx, "dbtype", "sqlite")
+		ctx = context.WithValue(ctx, ContextKeyDBType, "sqlite")
 	case "mssql":
 		initHandler = NewMssqlInitHandler()
-		ctx = context.WithValue(ctx, "dbtype", "mssql")
+		ctx = context.WithValue(ctx, ContextKeyDBType, "mssql")
 	default:
 		initHandler = NewMysqlInitHandler()
-		ctx = context.WithValue(ctx, "dbtype", "mysql")
+		ctx = context.WithValue(ctx, ContextKeyDBType, "mysql")
 	}
 	ctx, err = initHandler.EnsureDB(ctx, &conf)
 	if err != nil {
 		return err
 	}
 
-	db := ctx.Value("db").(*gorm.DB)
+	db := ctx.Value(ContextKeyDB).(*gorm.DB)
 	global.GVA_DB = db
 
 	if err = initHandler.InitTables(ctx, initializers); err != nil {

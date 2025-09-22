@@ -438,6 +438,7 @@
             "serverStatus": "服务器状态",
             "system": "系统配置",
             "systemTools": "系统工具",
+            "ratingManage": "评级管理",
             "tableTemplate": "表格模板",
             "templateConfig": "模板配置",
             "userManage": "用户管理",
@@ -884,4 +885,3 @@
         }
     }
 }
-

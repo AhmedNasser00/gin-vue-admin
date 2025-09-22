@@ -2,6 +2,7 @@ package system
 
 import (
 	"context"
+
 	sysModel "github.com/flipped-aurora/gin-vue-admin/server/model/system"
 	"github.com/flipped-aurora/gin-vue-admin/server/service/system"
 	"github.com/pkg/errors"
@@ -22,7 +23,7 @@ func (i *initExcelTemplate) InitializerName() string {
 }
 
 func (i *initExcelTemplate) MigrateTable(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -30,7 +31,7 @@ func (i *initExcelTemplate) MigrateTable(ctx context.Context) (context.Context, 
 }
 
 func (i *initExcelTemplate) TableCreated(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}
@@ -38,7 +39,7 @@ func (i *initExcelTemplate) TableCreated(ctx context.Context) bool {
 }
 
 func (i *initExcelTemplate) InitializeData(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -64,7 +65,7 @@ func (i *initExcelTemplate) InitializeData(ctx context.Context) (context.Context
 }
 
 func (i *initExcelTemplate) DataInserted(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

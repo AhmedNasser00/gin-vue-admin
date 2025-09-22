@@ -3,10 +3,11 @@ package translate
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"golang.org/x/text/language"
 	"io/ioutil"
 	"sync"
+
+	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"golang.org/x/text/language"
 )
 
 type Translator struct {
@@ -104,7 +105,7 @@ func (t *Translator) TranslateMessage(messageID string) string {
 
 	translatedMsg, err := localizer.LocalizeMessage(&i18n.Message{ID: messageID})
 	if err != nil || translatedMsg == "" { // if translation fail use default language transalator
-		fmt.Println(err.Error())
+		//fmt.Println(err.Error())
 		translatedMsg, err = defaultLocalizer.LocalizeMessage(&i18n.Message{ID: messageID})
 		if err != nil {
 			return messageID

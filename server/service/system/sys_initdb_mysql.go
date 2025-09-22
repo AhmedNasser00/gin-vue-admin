@@ -26,7 +26,7 @@ func NewMysqlInitHandler() *MysqlInitHandler {
 
 // WriteConfig mysql回写配置
 func (h MysqlInitHandler) WriteConfig(ctx context.Context) error {
-	c, ok := ctx.Value("config").(config.Mysql)
+	c, ok := ctx.Value(ContextKeyConfig).(config.Mysql)
 	if !ok {
 		return errors.New("mysql config invalid")
 	}
@@ -43,12 +43,12 @@ func (h MysqlInitHandler) WriteConfig(ctx context.Context) error {
 
 // EnsureDB 创建数据库并初始化 mysql
 func (h MysqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (next context.Context, err error) {
-	if s, ok := ctx.Value("dbtype").(string); !ok || s != "mysql" {
+	if s, ok := ctx.Value(ContextKeyDBType).(string); !ok || s != "mysql" {
 		return ctx, ErrDBTypeMismatch
 	}
 
 	c := conf.ToMysqlConfig()
-	next = context.WithValue(ctx, "config", c)
+	next = context.WithValue(ctx, ContextKeyConfig, c)
 	if c.Dbname == "" {
 		return ctx, nil
 	} // 如果没有数据库名, 则跳出初始化数据
@@ -68,7 +68,7 @@ func (h MysqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (n
 		return ctx, err
 	}
 	global.GVA_CONFIG.AutoCode.Root, _ = filepath.Abs("..")
-	next = context.WithValue(next, "db", db)
+	next = context.WithValue(next, ContextKeyDB, db)
 	return next, err
 }
 

@@ -408,6 +408,7 @@
             "system": "System Configuration",
             "systemTools": "System Tools",
             "tableTemplate": "Table Template",
+            "ratingManage": "Rating Management",
             "templateConfig": "Template Configuration",
             "userManage": "User Management",
             "website": "Official Website",
@@ -564,4 +565,3 @@
         "deleteChildrenFirst": "Please delete children first"
     }
 }
-
