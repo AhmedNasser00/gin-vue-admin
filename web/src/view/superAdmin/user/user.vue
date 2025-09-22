@@ -308,6 +308,16 @@
             :clearable="false"
           />
         </el-form-item>
+        <el-form-item v-if="showTeamDropdown" label="Team" prop="team">
+          <el-select v-model="userInfo.team" placeholder="Please select a team">
+            <el-option
+              v-for="item in teamOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item :label="t('view.superAdmin.user.enable')" prop="disabled">
           <el-switch
             v-model="userInfo.enable"
@@ -338,9 +348,9 @@
   import { getAuthorityList } from '@/api/authority'
   import CustomPic from '@/components/customPic/index.vue'
   import WarningBar from '@/components/warningBar/warningBar.vue'
-  import { setUserInfo, resetPassword } from '@/api/user.js'
+  import { setUserInfo, resetPassword } from '@/api/user'
 
-  import { nextTick, ref, watch } from 'vue'
+  import { nextTick, ref, watch, computed } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import SelectImage from '@/components/selectImage/selectImage.vue' // added by mohamed hassan to support multilingual
   import { useAppStore } from "@/pinia";
@@ -570,37 +580,8 @@
     authorityIds: [],
     enable: 1,
     team: ''
-  }
-  const userInfo = ref(JSON.parse(JSON.stringify(initUserInfo)))
+  })
 
-  const isTeamMemberOrLead = ref(false)
-
-  const authorityIdToName = {}
-  const findAuthority = (auths) => {
-    auths && auths.forEach(item => {
-      authorityIdToName[item.authorityId] = item.authorityName
-      if (item.children && item.children.length) {
-        findAuthority(item.children)
-      }
-    })
-  }
-
-  const checkTeamAuth = (authIdArray) => {
-    if (!authIdArray) authIdArray = []
-    // The role names to check against.
-    // These are the raw 'authorityName' values from the database.
-    const teamRoleNames = ['Team Lead', 'Team Member']
-    const selectedRoleNames = authIdArray.map(id => authorityIdToName[id])
-    const isTeamRole = selectedRoleNames.some(name => teamRoleNames.includes(name))
-
-    isTeamMemberOrLead.value = isTeamRole
-
-    if (!isTeamMemberOrLead.value) {
-      userInfo.value.team = '' // Clear team if the role is not applicable
-    }
-  }
-
-  // Watch for changes in the selected roles
   const rules = ref({
     userName: [
       {
@@ -656,6 +637,39 @@
     ]
   })
   const userForm = ref(null)
+
+  const teamOptions = [
+    { value: 'Android', label: 'Android' },
+    { value: 'Lunix', label: 'Lunix' },
+    { value: 'Backend', label: 'Backend' },
+    { value: 'Frontend', label: 'Frontend' },
+    { value: 'PM & BA', label: 'PM & BA' },
+  ]
+
+  const selectedRoleNames = computed(() => {
+    if (!userInfo.value.authorityIds || userInfo.value.authorityIds.length === 0) {
+      return []
+    }
+    const flatAuths = []
+    const flatten = (options) => {
+      options.forEach(option => {
+        flatAuths.push(option)
+        if (option.children && option.children.length) {
+          flatten(option.children)
+        }
+      })
+    }
+    flatten(authOptions.value)
+    return userInfo.value.authorityIds.map(id => flatAuths.find(auth => auth.authorityId === id)).filter(auth => auth).map(auth => auth.authorityName)
+  })
+
+  const showTeamDropdown = computed(() => {
+    return selectedRoleNames.value.some(roleName => ['Team Lead', 'Team Member'].includes(roleName))
+  })
+
+  watch(showTeamDropdown, (isShown) => {
+    if (!isShown) { userInfo.value.team = '' }
+  })
   const enterAddUserDialog = async () => {
     userInfo.value.authorityId = userInfo.value.authorityIds[0]
     userForm.value.validate(async (valid) => {
@@ -692,7 +706,9 @@
   const addUserDialog = ref(false)
   const closeAddUserDialog = () => {
     userForm.value.resetFields()
-    userInfo.value = JSON.parse(JSON.stringify(initUserInfo))
+    userInfo.value.headerImg = ''
+    userInfo.value.authorityIds = []
+    userInfo.value.team = ''
     addUserDialog.value = false
   }
 
