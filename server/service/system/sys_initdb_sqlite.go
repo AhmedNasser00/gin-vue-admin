@@ -64,23 +64,21 @@ func (h SqliteInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (
 	return next, err
 }
 
-func (h SqliteInitHandler) InitTables(ctx context.Context, inits initSlice) error {
+func (h SqliteInitHandler) InitTables(ctx context.Context, inits initSlice) (context.Context, error) {
 	return createTables(ctx, inits)
 }
 
 func (h SqliteInitHandler) InitData(ctx context.Context, inits initSlice) error {
-	next, cancel := context.WithCancel(ctx)
-	defer func(c func()) { c() }(cancel)
 	for _, init := range inits {
-		if init.DataInserted(next) {
+		if init.DataInserted(ctx) {
 			color.Info.Printf(InitDataExist, Sqlite, init.InitializerName())
 			continue
 		}
-		if n, err := init.InitializeData(next); err != nil {
+		if n, err := init.InitializeData(ctx); err != nil {
 			color.Info.Printf(InitDataFailed, Sqlite, init.InitializerName(), err)
 			return err
 		} else {
-			next = n
+			ctx = n
 			color.Info.Printf(InitDataSuccess, Sqlite, init.InitializerName())
 		}
 	}

@@ -60,7 +60,7 @@ type SubInitializer interface {
 type TypedDBInitHandler interface {
 	EnsureDB(ctx context.Context, conf *request.InitDB) (context.Context, error) // 建库，失败属于 fatal error，因此让它 panic
 	WriteConfig(ctx context.Context) error                                       // 回写配置
-	InitTables(ctx context.Context, inits initSlice) error                       // 建表 handler
+	InitTables(ctx context.Context, inits initSlice) (context.Context, error)    // 建表 handler
 	InitData(ctx context.Context, inits initSlice) error                         // 建数据 handler
 }
 
@@ -128,18 +128,20 @@ func (initDBService *InitDBService) InitDB(conf request.InitDB) (err error) {
 		initHandler = NewMysqlInitHandler()
 		ctx = context.WithValue(ctx, ContextKeyDBType, "mysql")
 	}
-	ctx, err = initHandler.EnsureDB(ctx, &conf)
+	next, err := initHandler.EnsureDB(ctx, &conf)
 	if err != nil {
 		return err
 	}
+	ctx = next
 
 	db := ctx.Value(ContextKeyDB).(*gorm.DB)
 	global.GVA_DB = db
 
-	if err = initHandler.InitTables(ctx, initializers); err != nil {
+	next, err = initHandler.InitTables(ctx, initializers)
+	if err != nil {
 		return err
 	}
-	if err = initHandler.InitData(ctx, initializers); err != nil {
+	if err = initHandler.InitData(next, initializers); err != nil {
 		return err
 	}
 
@@ -171,20 +173,18 @@ func createDatabase(dsn string, driver string, createSql string) error {
 }
 
 // createTables 创建表（默认 dbInitHandler.initTables 行为）
-func createTables(ctx context.Context, inits initSlice) error {
-	next, cancel := context.WithCancel(ctx)
-	defer func(c func()) { c() }(cancel)
+func createTables(ctx context.Context, inits initSlice) (context.Context, error) {
 	for _, init := range inits {
-		if init.TableCreated(next) {
+		if init.TableCreated(ctx) {
 			continue
 		}
-		if n, err := init.MigrateTable(next); err != nil {
-			return err
+		if n, err := init.MigrateTable(ctx); err != nil {
+			return ctx, err
 		} else {
-			next = n
+			ctx = n
 		}
 	}
-	return nil
+	return ctx, nil
 }
 
 /* -- sortable interface -- */

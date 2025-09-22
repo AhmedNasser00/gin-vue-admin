@@ -68,23 +68,21 @@ func (h MssqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (n
 	return next, err
 }
 
-func (h MssqlInitHandler) InitTables(ctx context.Context, inits initSlice) error {
+func (h MssqlInitHandler) InitTables(ctx context.Context, inits initSlice) (context.Context, error) {
 	return createTables(ctx, inits)
 }
 
 func (h MssqlInitHandler) InitData(ctx context.Context, inits initSlice) error {
-	next, cancel := context.WithCancel(ctx)
-	defer func(c func()) { c() }(cancel)
 	for _, init := range inits {
-		if init.DataInserted(next) {
+		if init.DataInserted(ctx) {
 			color.Info.Printf(InitDataExist, Mssql, init.InitializerName())
 			continue
 		}
-		if n, err := init.InitializeData(next); err != nil {
+		if n, err := init.InitializeData(ctx); err != nil {
 			color.Info.Printf(InitDataFailed, Mssql, init.InitializerName(), err)
 			return err
 		} else {
-			next = n
+			ctx = n
 			color.Info.Printf(InitDataSuccess, Mssql, init.InitializerName())
 		}
 	}

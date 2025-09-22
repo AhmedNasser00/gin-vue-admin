@@ -76,23 +76,21 @@ func (h PgsqlInitHandler) EnsureDB(ctx context.Context, conf *request.InitDB) (n
 	return next, err
 }
 
-func (h PgsqlInitHandler) InitTables(ctx context.Context, inits initSlice) error {
+func (h PgsqlInitHandler) InitTables(ctx context.Context, inits initSlice) (context.Context, error) {
 	return createTables(ctx, inits)
 }
 
 func (h PgsqlInitHandler) InitData(ctx context.Context, inits initSlice) error {
-	next, cancel := context.WithCancel(ctx)
-	defer func(c func()) { c() }(cancel)
 	for i := 0; i < len(inits); i++ {
-		if inits[i].DataInserted(next) {
+		if inits[i].DataInserted(ctx) {
 			color.Info.Printf(InitDataExist, Pgsql, inits[i].InitializerName())
 			continue
 		}
-		if n, err := inits[i].InitializeData(next); err != nil {
+		if n, err := inits[i].InitializeData(ctx); err != nil {
 			color.Info.Printf(InitDataFailed, Pgsql, inits[i].InitializerName(), err)
 			return err
 		} else {
-			next = n
+			ctx = n
 			color.Info.Printf(InitDataSuccess, Pgsql, inits[i].InitializerName())
 		}
 	}
