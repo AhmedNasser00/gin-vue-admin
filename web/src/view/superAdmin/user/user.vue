@@ -271,7 +271,7 @@
           <el-input v-model="userInfo.email" />
         </el-form-item>
         <el-form-item
-          v-if="isTeamMemberOrLead"
+          v-if="showTeamDropdown"
           :label="t('view.superAdmin.user.team')"
           prop="team"
         >
@@ -304,21 +304,10 @@
               disabled: 'disabled',
               emitPath: false
             }"
-            @change="checkTeamAuth"
             :clearable="false"
           />
         </el-form-item>
-        <el-form-item v-if="showTeamDropdown" label="Team" prop="team">
-          <el-select v-model="userInfo.team" placeholder="Please select a team">
-            <el-option
-              v-for="item in teamOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item :label="t('view.superAdmin.user.enable')" prop="disabled">
+                <el-form-item :label="t('view.superAdmin.user.enable')" prop="disabled">
           <el-switch
             v-model="userInfo.enable"
             inline-prompt
@@ -439,14 +428,19 @@
     }
   }
 
-  const teamOptions = ref([
-    { label: 'Android', value: 'Android' },
-    { label: 'Linux', value: 'Linux' },
-    { label: 'Frontend', value: 'Frontend' },
-    { label: 'Backend', value: 'Backend' },
-    { label: 'QC', value: 'QC' },
-    { label: 'PM & BA', value: 'PM & BA' },
-  ])
+  const authOptions = ref([])
+  const setOptions = (authData) => {
+    authOptions.value = []
+    setAuthorityOptions(authData, authOptions.value)
+  }
+
+  const teamOptions = [
+    { value: 'Android', label: 'Android' },
+    { value: 'Lunix', label: 'Lunix' },
+    { value: 'Backend', label: 'Backend' },
+    { value: 'Frontend', label: 'Frontend' },
+    { value: 'PM & BA', label: 'PM & BA' },
+  ]
 
   const initPage = async () => {
     getTableData()
@@ -549,13 +543,6 @@
       })
   }
 
-  const authOptions = ref([])
-  const setOptions = (authData) => {
-    authOptions.value = []
-    setAuthorityOptions(authData, authOptions.value)
-    findAuthority(authOptions.value)
-  }
-
   const deleteUserFunc = async (row) => {
     ElMessageBox.confirm(t('general.deleteConfirm'), t('general.hint'), {
       confirmButtonText: t('general.confirm'),
@@ -580,7 +567,9 @@
     authorityIds: [],
     enable: 1,
     team: ''
-  })
+  };
+
+  const userInfo = ref(JSON.parse(JSON.stringify(initUserInfo)))
 
   const rules = ref({
     userName: [
@@ -637,14 +626,6 @@
     ]
   })
   const userForm = ref(null)
-
-  const teamOptions = [
-    { value: 'Android', label: 'Android' },
-    { value: 'Lunix', label: 'Lunix' },
-    { value: 'Backend', label: 'Backend' },
-    { value: 'Frontend', label: 'Frontend' },
-    { value: 'PM & BA', label: 'PM & BA' },
-  ]
 
   const selectedRoleNames = computed(() => {
     if (!userInfo.value.authorityIds || userInfo.value.authorityIds.length === 0) {
@@ -717,7 +698,6 @@
   const addUser = () => {
     dialogFlag.value = 'add'
     userInfo.value = JSON.parse(JSON.stringify(initUserInfo))
-    isTeamMemberOrLead.value = false
     addUserDialog.value = true
   }
 
@@ -752,7 +732,6 @@
   const openEdit = (row) => {
     dialogFlag.value = 'edit'
     userInfo.value = JSON.parse(JSON.stringify(row))
-    checkTeamAuth(userInfo.value.authorityIds || [])
     addUserDialog.value = true
   }
 
@@ -776,7 +755,15 @@
 </script>
 
 <style lang="scss">
-  .header-img-box {
-    @apply w-52 h-52 border border-solid border-gray-300 rounded-xl flex justify-center items-center cursor-pointer;
+  /* Reusable 208×208px clickable, centered, rounded header image container */
+  @layer components {
+    .header-img-box {
+      @apply
+        w-52 h-52
+        border border-solid border-gray-300
+        rounded-xl
+        flex justify-center items-center
+        cursor-pointer;
+    }
   }
 </style>
