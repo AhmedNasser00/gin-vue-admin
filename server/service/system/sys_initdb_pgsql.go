@@ -81,18 +81,18 @@ func (h PgsqlInitHandler) InitTables(ctx context.Context, inits initSlice) (cont
 }
 
 func (h PgsqlInitHandler) InitData(ctx context.Context, inits initSlice) error {
-	for i := 0; i < len(inits); i++ {
-		if inits[i].DataInserted(ctx) {
-			color.Info.Printf(InitDataExist, Pgsql, inits[i].InitializerName())
+	for _, init := range inits {
+		if init.DataInserted(ctx) {
+			color.Info.Printf(InitDataExist, Pgsql, init.InitializerName())
 			continue
 		}
-		if n, err := inits[i].InitializeData(ctx); err != nil {
-			color.Info.Printf(InitDataFailed, Pgsql, inits[i].InitializerName(), err)
+		n, err := init.InitializeData(ctx)
+		if err != nil {
+			color.Info.Printf(InitDataFailed, Pgsql, init.InitializerName(), err)
 			return err
-		} else {
-			ctx = n
-			color.Info.Printf(InitDataSuccess, Pgsql, inits[i].InitializerName())
 		}
+		ctx = n
+		color.Info.Printf(InitDataSuccess, Pgsql, init.InitializerName())
 	}
 	color.Info.Printf(InitSuccess, Pgsql)
 	return nil

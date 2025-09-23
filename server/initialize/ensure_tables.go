@@ -31,7 +31,7 @@ func (e *ensureTables) DataInserted(ctx context.Context) bool {
 }
 
 func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error) {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return ctx, system.ErrMissingDBContext
 	}
@@ -54,6 +54,7 @@ func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error
 		sysModel.JoinTemplate{},
 		sysModel.SysParams{},
 		sysModel.SysVersion{},
+		sysModel.SysRating{},
 		adapter.CasbinRule{},
 
 		example.ExaFile{},
@@ -73,7 +74,7 @@ func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error
 }
 
 func (e *ensureTables) TableCreated(ctx context.Context) bool {
-	db, ok := ctx.Value("db").(*gorm.DB)
+	db, ok := ctx.Value(system.ContextKeyDB).(*gorm.DB)
 	if !ok {
 		return false
 	}

@@ -7,7 +7,7 @@ import (
 // SysRating 结构体
 type SysRating struct {
 	global.GVA_MODEL
-	Rating           *int   `json:"rating" form:"rating" gorm:"column:rating;comment:评级值;"`
+	Rating           *int   `json:"rating" form:"rating" gorm:"column:rating;uniqueIndex;comment:评级值;"`
 	Description      string `json:"description" form:"description" gorm:"column:description;comment:描述;"`
 	PerformanceLevel string `json:"performanceLevel" form:"performanceLevel" gorm:"column:performance_level;comment:绩效水平;"`
 	MinPercentage    *int   `json:"minPercentage" form:"minPercentage" gorm:"column:min_percentage;comment:最小百分比;"`

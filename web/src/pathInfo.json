@@ -44,6 +44,7 @@
   "/src/view/layout/tabs/index.vue": "HistoryComponent",
   "/src/view/login/index.vue": "Login",
   "/src/view/person/person.vue": "Person",
+  "/src/view/rating/rating.vue": "Rating",
   "/src/view/routerHolder.vue": "RouterHolder",
   "/src/view/superAdmin/api/api.vue": "Api",
   "/src/view/superAdmin/authority/authority.vue": "Authority",

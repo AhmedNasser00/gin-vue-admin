@@ -396,6 +396,16 @@
     }
   },
   "view": {
+    "rating": {
+      "title": "评级",
+      "listTitle": "评级列表",
+      "rating": "评级",
+      "description": "描述",
+      "performanceLevel": "绩效水平",
+      "minPercentage": "最小百分比",
+      "maxPercentage": "最大百分比",
+      "range": "百分比范围"
+    },
     "about": {
       "flippedAuroraTeam": "flipped-aurora团队",
       "submitRecords": "提交记录"

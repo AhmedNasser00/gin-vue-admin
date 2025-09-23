@@ -200,6 +200,15 @@ func (i *initCasbin) InitializeData(ctx context.Context) (context.Context, error
 		{Ptype: "p", V0: "888", V1: "/sysVersion/deleteSysVersion", V2: "DELETE"},
 		{Ptype: "p", V0: "888", V1: "/sysVersion/deleteSysVersionByIds", V2: "DELETE"},
 
+		// Rating management (admin 888)
+		{Ptype: "p", V0: "888", V1: "/rating/createRating", V2: "POST"},
+		{Ptype: "p", V0: "888", V1: "/rating/deleteRating", V2: "DELETE"},
+		{Ptype: "p", V0: "888", V1: "/rating/deleteRatingByIds", V2: "DELETE"},
+		{Ptype: "p", V0: "888", V1: "/rating/updateRating", V2: "PUT"},
+		{Ptype: "p", V0: "888", V1: "/rating/findRating", V2: "GET"},
+		{Ptype: "p", V0: "888", V1: "/rating/getRatingList", V2: "GET"},
+		{Ptype: "p", V0: "888", V1: "/rating/getRatingListAll", V2: "GET"},
+
 		{Ptype: "p", V0: "8881", V1: "/user/admin_register", V2: "POST"},
 		{Ptype: "p", V0: "8881", V1: "/api/createApi", V2: "POST"},
 		{Ptype: "p", V0: "8881", V1: "/api/getApiList", V2: "POST"},
@@ -238,8 +247,20 @@ func (i *initCasbin) InitializeData(ctx context.Context) (context.Context, error
 		{Ptype: "p", V0: "8881", V1: "/customer/customer", V2: "DELETE"},
 		{Ptype: "p", V0: "8881", V1: "/customer/customer", V2: "GET"},
 		{Ptype: "p", V0: "8881", V1: "/customer/customerList", V2: "GET"},
+		// Rating management (normal 8881 - read only)
+		{Ptype: "p", V0: "8881", V1: "/rating/findRating", V2: "GET"},
+		{Ptype: "p", V0: "8881", V1: "/rating/getRatingList", V2: "GET"},
+		{Ptype: "p", V0: "8881", V1: "/rating/getRatingListAll", V2: "GET"},
 		{Ptype: "p", V0: "8881", V1: "/user/getUserInfo", V2: "GET"},
 
+		// Rating management (test 9528)
+		{Ptype: "p", V0: "9528", V1: "/rating/createRating", V2: "POST"},
+		{Ptype: "p", V0: "9528", V1: "/rating/deleteRating", V2: "DELETE"},
+		{Ptype: "p", V0: "9528", V1: "/rating/deleteRatingByIds", V2: "DELETE"},
+		{Ptype: "p", V0: "9528", V1: "/rating/updateRating", V2: "PUT"},
+		{Ptype: "p", V0: "9528", V1: "/rating/findRating", V2: "GET"},
+		{Ptype: "p", V0: "9528", V1: "/rating/getRatingList", V2: "GET"},
+		{Ptype: "p", V0: "9528", V1: "/rating/getRatingListAll", V2: "GET"},
 		{Ptype: "p", V0: "9528", V1: "/user/admin_register", V2: "POST"},
 		{Ptype: "p", V0: "9528", V1: "/api/createApi", V2: "POST"},
 		{Ptype: "p", V0: "9528", V1: "/api/getApiList", V2: "POST"},

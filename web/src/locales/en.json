@@ -384,6 +384,16 @@
     }
   },
   "view": {
+    "rating": {
+      "title": "Rating",
+      "listTitle": "Rating List",
+      "rating": "Rating",
+      "description": "Description",
+      "performanceLevel": "Performance Level",
+      "minPercentage": "Minimum Percentage",
+      "maxPercentage": "Maximum Percentage",
+      "range": "Percentage Range"
+    },
     "about": {
       "flippedAuroraTeam": "Flipped-Aurora Team",
       "submitRecords": "Releases History"

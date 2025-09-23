@@ -1,7 +1,7 @@
 package initialize
 
 import (
-	"os"
+	"fmt"
 
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/model/example"
@@ -34,8 +34,11 @@ func Gorm() *gorm.DB {
 	}
 }
 
-func RegisterTables() {
+func RegisterTables() error {
 	db := global.GVA_DB
+	if db == nil {
+		return fmt.Errorf("database connection is nil")
+	}
 	err := db.AutoMigrate(
 
 		system.SysApi{},
@@ -57,6 +60,7 @@ func RegisterTables() {
 		system.JoinTemplate{},
 		system.SysParams{},
 		system.SysVersion{},
+		system.SysRating{},
 
 		example.ExaFile{},
 		example.ExaCustomer{},
@@ -66,14 +70,15 @@ func RegisterTables() {
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))
-		os.Exit(0)
+		return fmt.Errorf("failed to register tables: %w", err)
 	}
 
 	err = bizModel()
-
 	if err != nil {
 		global.GVA_LOG.Error("register biz_table failed", zap.Error(err))
-		os.Exit(0)
+		return fmt.Errorf("failed to register biz tables: %w", err)
 	}
+
 	global.GVA_LOG.Info("register table success")
+	return nil
 }

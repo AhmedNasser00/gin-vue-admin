@@ -74,13 +74,13 @@ func (h SqliteInitHandler) InitData(ctx context.Context, inits initSlice) error 
 			color.Info.Printf(InitDataExist, Sqlite, init.InitializerName())
 			continue
 		}
-		if n, err := init.InitializeData(ctx); err != nil {
+		n, err := init.InitializeData(ctx)
+		if err != nil {
 			color.Info.Printf(InitDataFailed, Sqlite, init.InitializerName(), err)
 			return err
-		} else {
-			ctx = n
-			color.Info.Printf(InitDataSuccess, Sqlite, init.InitializerName())
 		}
+		ctx = n
+		color.Info.Printf(InitDataSuccess, Sqlite, init.InitializerName())
 	}
 	color.Info.Printf(InitSuccess, Sqlite)
 	return nil

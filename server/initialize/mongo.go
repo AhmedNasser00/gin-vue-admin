@@ -3,6 +3,9 @@ package initialize
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strings"
+
 	"github.com/flipped-aurora/gin-vue-admin/server/global"
 	"github.com/flipped-aurora/gin-vue-admin/server/initialize/internal"
 	"github.com/flipped-aurora/gin-vue-admin/server/utils"
@@ -11,8 +14,6 @@ import (
 	"github.com/qiniu/qmgo/options"
 	"go.mongodb.org/mongo-driver/bson"
 	option "go.mongodb.org/mongo-driver/mongo/options"
-	"sort"
-	"strings"
 )
 
 var Mongo = new(mongo)
@@ -111,19 +112,14 @@ func (m *mongo) CreateIndexes(ctx context.Context, name string, indexes [][]stri
 	length = len(entities)
 	indexMap2 := make(map[string]map[string]string, length)
 	for i := 0; i < length; i++ {
-		v1, o1 := indexMap2[entities[i].Name]
+		_, o1 := indexMap2[entities[i].Name]
 		if !o1 {
 			keyLength := len(entities[i].Key)
-			v1 = make(map[string]string, keyLength)
+			v1 := make(map[string]string, keyLength)
 			for j := 0; j < keyLength; j++ {
-				v2, o2 := v1[entities[i].Key[j].Key]
-				if !o2 {
-					v1 = make(map[string]string)
-				}
-				v2 = entities[i].Key[j].Key
-				v1[entities[i].Key[j].Key] = v2
-				indexMap2[entities[i].Name] = v1
+				v1[entities[i].Key[j].Key] = entities[i].Key[j].Key
 			}
+			indexMap2[entities[i].Name] = v1
 		}
 	}
 	for k1, v1 := range indexMap1 {

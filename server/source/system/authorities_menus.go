@@ -44,7 +44,7 @@ func (i *initMenuAuthority) InitializeData(ctx context.Context) (next context.Co
 
 	allMenus, ok := ctx.Value(new(initMenu).InitializerName()).([]sysModel.SysBaseMenu)
 	if !ok {
-		return next, errors.Wrap(errors.New(""), "创建 [菜单-权限] 关联失败, 未找到菜单表初始化数据")
+		return ctx, errors.Wrap(errors.New(""), "创建 [菜单-权限] 关联失败, 未找到菜单表初始化数据")
 	}
 	next = ctx
 

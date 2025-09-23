@@ -82,13 +82,13 @@ func (h MysqlInitHandler) InitData(ctx context.Context, inits initSlice) error {
 			color.Info.Printf(InitDataExist, Mysql, init.InitializerName())
 			continue
 		}
-		if n, err := init.InitializeData(ctx); err != nil {
+		n, err := init.InitializeData(ctx)
+		if err != nil {
 			color.Info.Printf(InitDataFailed, Mysql, init.InitializerName(), err)
 			return err
-		} else {
-			ctx = n
-			color.Info.Printf(InitDataSuccess, Mysql, init.InitializerName())
 		}
+		ctx = n
+		color.Info.Printf(InitDataSuccess, Mysql, init.InitializerName())
 	}
 	color.Info.Printf(InitSuccess, Mysql)
 	return nil

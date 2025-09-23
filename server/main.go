@@ -54,6 +54,9 @@ func initializeSystem() {
 
 	initialize.SetupHandlers() // 注册全局函数
 	if global.GVA_DB != nil {
-		initialize.RegisterTables() // 初始化表
+		if err := initialize.RegisterTables(); err != nil {
+			global.GVA_LOG.Error("register tables failed", zap.Error(err))
+			panic("Failed to register tables: " + err.Error())
+		}
 	}
 }

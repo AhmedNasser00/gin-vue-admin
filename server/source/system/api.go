@@ -199,6 +199,15 @@ func (i *initApi) InitializeData(ctx context.Context) (context.Context, error) {
 		{ApiGroup: "版本控制", Method: "POST", Path: "/sysVersion/importVersion", Description: "同步版本"},
 		{ApiGroup: "版本控制", Method: "DELETE", Path: "/sysVersion/deleteSysVersion", Description: "删除版本"},
 		{ApiGroup: "版本控制", Method: "DELETE", Path: "/sysVersion/deleteSysVersionByIds", Description: "批量删除版本"},
+
+		// Rating management
+		{ApiGroup: "system.api.group.rating", Method: "POST", Path: "/rating/createRating", Description: "Create rating"},
+		{ApiGroup: "system.api.group.rating", Method: "DELETE", Path: "/rating/deleteRating", Description: "Delete rating"},
+		{ApiGroup: "system.api.group.rating", Method: "DELETE", Path: "/rating/deleteRatingByIds", Description: "Batch delete ratings"},
+		{ApiGroup: "system.api.group.rating", Method: "PUT", Path: "/rating/updateRating", Description: "Update rating"},
+		{ApiGroup: "system.api.group.rating", Method: "GET", Path: "/rating/findRating", Description: "Find rating by ID"},
+		{ApiGroup: "system.api.group.rating", Method: "GET", Path: "/rating/getRatingList", Description: "Get rating list"},
+		{ApiGroup: "system.api.group.rating", Method: "GET", Path: "/rating/getRatingListAll", Description: "Get all ratings"},
 	}
 	if err := db.Create(&entities).Error; err != nil {
 		return ctx, errors.Wrap(err, sysModel.SysApi{}.TableName()+" "+global.Translate("general.tabelDataInitFail"))
