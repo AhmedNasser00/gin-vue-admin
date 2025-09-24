@@ -87,6 +87,9 @@ func (i *initMenu) InitializeData(ctx context.Context) (next context.Context, er
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "operation", Name: "operation", Component: "view/superAdmin/operation/sysOperationRecord.vue", Sort: 6, Meta: Meta{Title: "system.menu.operationLog", Icon: "pie-chart"}},
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "sysParams", Name: "sysParams", Component: "view/superAdmin/params/sysParams.vue", Sort: 7, Meta: Meta{Title: "system.menu.parameterManagement", Icon: "compass"}},
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "rating", Name: "rating", Component: "view/rating/rating.vue", Sort: 8, Meta: Meta{Title: "system.menu.ratingManage", Icon: "star"}},
+		// KPI Management under Administration Tools (same as rating)
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "kpiCategory", Name: "KpiCategory", Component: "view/kpi/category.vue", Sort: 9, Meta: Meta{Title: "KPI Category", Icon: "list"}},
+		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["superAdmin"], Path: "kpiItem", Name: "KpiItem", Component: "view/kpi/item.vue", Sort: 10, Meta: Meta{Title: "KPI Item", Icon: "list"}},
 
 		// example子菜单
 		{MenuLevel: 1, Hidden: false, ParentId: menuNameMap["example"], Path: "upload", Name: "upload", Component: "view/example/upload/upload.vue", Sort: 5, Meta: Meta{Title: "system.menu.mediaLibUpDown", Icon: "upload"}},

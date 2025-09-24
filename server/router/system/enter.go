@@ -21,6 +21,7 @@ type RouterGroup struct {
 	SysParamsRouter
 	SysVersionRouter
 	RatingRouter
+	KpiRouter
 }
 
 var (

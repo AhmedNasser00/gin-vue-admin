@@ -12,41 +12,59 @@ import (
 
 var (
 	syncedCachedEnforcer *casbin.SyncedCachedEnforcer
-	once                 sync.Once
+	enforcerInitMu       sync.Mutex
 )
 
 // GetCasbin 获取casbin实例
 func GetCasbin() *casbin.SyncedCachedEnforcer {
-	once.Do(func() {
-		a, err := gormadapter.NewAdapterByDB(global.GVA_DB)
-		if err != nil {
-			zap.L().Error("适配数据库失败请检查casbin表是否为InnoDB引擎!", zap.Error(err))
-			return
-		}
-		text := `
-		[request_definition]
-		r = sub, obj, act
-		
-		[policy_definition]
-		p = sub, obj, act
-		
-		[role_definition]
-		g = _, _
-		
-		[policy_effect]
-		e = some(where (p.eft == allow))
-		
-		[matchers]
-		m = r.sub == p.sub && keyMatch2(r.obj,p.obj) && r.act == p.act
-		`
-		m, err := model.NewModelFromString(text)
-		if err != nil {
-			zap.L().Error("字符串加载模型失败!", zap.Error(err))
-			return
-		}
-		syncedCachedEnforcer, _ = casbin.NewSyncedCachedEnforcer(m, a)
-		syncedCachedEnforcer.SetExpireTime(60 * 60)
-		_ = syncedCachedEnforcer.LoadPolicy()
-	})
+	if syncedCachedEnforcer != nil {
+		return syncedCachedEnforcer
+	}
+	enforcerInitMu.Lock()
+	defer enforcerInitMu.Unlock()
+	if syncedCachedEnforcer != nil {
+		return syncedCachedEnforcer
+	}
+	if global.GVA_DB == nil {
+		// DB not ready yet
+		return nil
+	}
+	a, err := gormadapter.NewAdapterByDB(global.GVA_DB)
+	if err != nil {
+		zap.L().Error("Casbin 适配数据库失败", zap.Error(err))
+		return nil
+	}
+	text := `
+    [request_definition]
+    r = sub, obj, act
+    
+    [policy_definition]
+    p = sub, obj, act
+    
+    [role_definition]
+    g = _, _
+    
+    [policy_effect]
+    e = some(where (p.eft == allow))
+    
+    [matchers]
+    m = r.sub == p.sub && keyMatch2(r.obj,p.obj) && r.act == p.act
+    `
+	m, err := model.NewModelFromString(text)
+	if err != nil {
+		zap.L().Error("Casbin 字符串加载模型失败", zap.Error(err))
+		return nil
+	}
+	enforcer, err := casbin.NewSyncedCachedEnforcer(m, a)
+	if err != nil {
+		zap.L().Error("Casbin Enforcer 创建失败", zap.Error(err))
+		return nil
+	}
+	enforcer.SetExpireTime(60 * 60)
+	if err := enforcer.LoadPolicy(); err != nil {
+		zap.L().Error("Casbin 加载策略失败", zap.Error(err))
+		return nil
+	}
+	syncedCachedEnforcer = enforcer
 	return syncedCachedEnforcer
 }

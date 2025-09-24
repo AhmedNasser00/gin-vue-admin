@@ -61,6 +61,8 @@ func RegisterTables() error {
 		system.SysParams{},
 		system.SysVersion{},
 		system.SysRating{},
+		system.SysKpiCategory{},
+		system.SysKpiItem{},
 
 		example.ExaFile{},
 		example.ExaCustomer{},

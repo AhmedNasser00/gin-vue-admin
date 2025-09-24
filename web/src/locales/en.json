@@ -323,7 +323,11 @@
     "multiLogin": "Multi-login interception",
     "ossType": "Oss Type",
     "portValue": "Port Value",
-    "systemConfig": "System Configuration"
+    "systemConfig": "System Configuration",
+    "menu": {
+      "kpiCategory": "KPI Category",
+      "kpiItem": "KPI Item"
+    }
   },
   "pinia": {
     "modules": {
@@ -384,6 +388,20 @@
     }
   },
   "view": {
+    "kpi": {
+      "category": {
+        "title": "KPI Category",
+        "name": "Name",
+        "description": "Description",
+        "weight": "Weight (%)"
+      },
+      "item": {
+        "title": "KPI Item",
+        "category": "Category",
+        "name": "Name",
+        "weight": "Weight (%)"
+      }
+    },
     "rating": {
       "title": "Rating",
       "listTitle": "Rating List",

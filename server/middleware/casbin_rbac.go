@@ -22,6 +22,11 @@ func CasbinHandler() gin.HandlerFunc {
 		// 获取用户的角色
 		sub := strconv.Itoa(int(waitUse.AuthorityId))
 		e := utils.GetCasbin() // 判断策略中是否存在
+		if e == nil {          // 防止nil指针导致服务panic
+			response.FailWithMessage("permission service not ready, please retry", c)
+			c.Abort()
+			return
+		}
 		success, _ := e.Enforce(sub, obj, act)
 		if !success {
 			response.FailWithDetailed(gin.H{}, global.Translate("general.insufficientPermissions"), c)

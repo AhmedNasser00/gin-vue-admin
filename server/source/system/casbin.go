@@ -209,6 +209,20 @@ func (i *initCasbin) InitializeData(ctx context.Context) (context.Context, error
 		{Ptype: "p", V0: "888", V1: "/rating/getRatingList", V2: "GET"},
 		{Ptype: "p", V0: "888", V1: "/rating/getRatingListAll", V2: "GET"},
 
+		// KPI management (admin 888)
+		{Ptype: "p", V0: "888", V1: "/kpi/createCategory", V2: "POST"},
+		{Ptype: "p", V0: "888", V1: "/kpi/deleteCategory", V2: "DELETE"},
+		{Ptype: "p", V0: "888", V1: "/kpi/deleteCategoryByIds", V2: "DELETE"},
+		{Ptype: "p", V0: "888", V1: "/kpi/updateCategory", V2: "PUT"},
+		{Ptype: "p", V0: "888", V1: "/kpi/findCategory", V2: "GET"},
+		{Ptype: "p", V0: "888", V1: "/kpi/getCategoryList", V2: "GET"},
+		{Ptype: "p", V0: "888", V1: "/kpi/createItem", V2: "POST"},
+		{Ptype: "p", V0: "888", V1: "/kpi/deleteItem", V2: "DELETE"},
+		{Ptype: "p", V0: "888", V1: "/kpi/deleteItemByIds", V2: "DELETE"},
+		{Ptype: "p", V0: "888", V1: "/kpi/updateItem", V2: "PUT"},
+		{Ptype: "p", V0: "888", V1: "/kpi/findItem", V2: "GET"},
+		{Ptype: "p", V0: "888", V1: "/kpi/getItemList", V2: "GET"},
+
 		{Ptype: "p", V0: "8881", V1: "/user/admin_register", V2: "POST"},
 		{Ptype: "p", V0: "8881", V1: "/api/createApi", V2: "POST"},
 		{Ptype: "p", V0: "8881", V1: "/api/getApiList", V2: "POST"},
@@ -307,6 +321,7 @@ func (i *initCasbin) InitializeData(ctx context.Context) (context.Context, error
 	if err := db.Create(&entities).Error; err != nil {
 		return ctx, errors.Wrap(err, "Casbin 表 ("+i.InitializerName()+") 数据初始化失败!")
 	}
+	// nolint:SA1029 - project uses string keys for initializer context fan-out
 	next := context.WithValue(ctx, i.InitializerName(), entities)
 	return next, nil
 }

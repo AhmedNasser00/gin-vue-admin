@@ -47,13 +47,16 @@ func initServer(address string, router *gin.Engine, readTimeout, writeTimeout ti
 	<-quit
 	zap.L().Info("关闭WEB服务...")
 
-	// 设置5秒的超时时间
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-
+	// 设置30秒的超时时间
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		zap.L().Fatal("WEB服务关闭异常", zap.Error(err))
+		if err == context.DeadlineExceeded {
+			zap.L().Warn("WEB服务关闭超时，强制关闭")
+		} else {
+			zap.L().Error("WEB服务关闭异常", zap.Error(err))
+		}
 	}
 
 	zap.L().Info("WEB服务已关闭")

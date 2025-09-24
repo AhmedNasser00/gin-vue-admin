@@ -396,6 +396,20 @@
     }
   },
   "view": {
+    "kpi": {
+      "category": {
+        "title": "KPI 类别",
+        "name": "名称",
+        "description": "描述",
+        "weight": "权重(%)"
+      },
+      "item": {
+        "title": "KPI 项",
+        "category": "类别",
+        "name": "名称",
+        "weight": "权重(%)"
+      }
+    },
     "rating": {
       "title": "评级",
       "listTitle": "评级列表",

@@ -208,10 +208,27 @@ func (i *initApi) InitializeData(ctx context.Context) (context.Context, error) {
 		{ApiGroup: "system.api.group.rating", Method: "GET", Path: "/rating/findRating", Description: "Find rating by ID"},
 		{ApiGroup: "system.api.group.rating", Method: "GET", Path: "/rating/getRatingList", Description: "Get rating list"},
 		{ApiGroup: "system.api.group.rating", Method: "GET", Path: "/rating/getRatingListAll", Description: "Get all ratings"},
+
+		// KPI management - Category
+		{ApiGroup: "system.api.group.kpi", Method: "POST", Path: "/kpi/createCategory", Description: "Create KPI Category"},
+		{ApiGroup: "system.api.group.kpi", Method: "DELETE", Path: "/kpi/deleteCategory", Description: "Delete KPI Category"},
+		{ApiGroup: "system.api.group.kpi", Method: "DELETE", Path: "/kpi/deleteCategoryByIds", Description: "Batch delete KPI Categories"},
+		{ApiGroup: "system.api.group.kpi", Method: "PUT", Path: "/kpi/updateCategory", Description: "Update KPI Category"},
+		{ApiGroup: "system.api.group.kpi", Method: "GET", Path: "/kpi/findCategory", Description: "Find KPI Category by ID"},
+		{ApiGroup: "system.api.group.kpi", Method: "GET", Path: "/kpi/getCategoryList", Description: "Get KPI Category list"},
+
+		// KPI management - Item
+		{ApiGroup: "system.api.group.kpi", Method: "POST", Path: "/kpi/createItem", Description: "Create KPI Item"},
+		{ApiGroup: "system.api.group.kpi", Method: "DELETE", Path: "/kpi/deleteItem", Description: "Delete KPI Item"},
+		{ApiGroup: "system.api.group.kpi", Method: "DELETE", Path: "/kpi/deleteItemByIds", Description: "Batch delete KPI Items"},
+		{ApiGroup: "system.api.group.kpi", Method: "PUT", Path: "/kpi/updateItem", Description: "Update KPI Item"},
+		{ApiGroup: "system.api.group.kpi", Method: "GET", Path: "/kpi/findItem", Description: "Find KPI Item by ID"},
+		{ApiGroup: "system.api.group.kpi", Method: "GET", Path: "/kpi/getItemList", Description: "Get KPI Item list"},
 	}
 	if err := db.Create(&entities).Error; err != nil {
 		return ctx, errors.Wrap(err, sysModel.SysApi{}.TableName()+" "+global.Translate("general.tabelDataInitFail"))
 	}
+	// nolint:SA1029 - project uses string keys for initializer context fan-out
 	next := context.WithValue(ctx, i.InitializerName(), entities)
 	return next, nil
 }

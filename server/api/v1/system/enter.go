@@ -24,6 +24,7 @@ type ApiGroup struct {
 	RatingApi
 	SysParamsApi
 	SysVersionApi
+	KpiApi
 }
 
 var (
@@ -48,4 +49,5 @@ var (
 	autoCodeTemplateService = service.ServiceGroupApp.SystemServiceGroup.AutoCodeTemplate
 	sysVersionService       = service.ServiceGroupApp.SystemServiceGroup.SysVersionService
 	ratingService           = service.ServiceGroupApp.SystemServiceGroup.RatingService
+	kpiService              = service.ServiceGroupApp.SystemServiceGroup.KpiService
 )
